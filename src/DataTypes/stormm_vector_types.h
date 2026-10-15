@@ -9,6 +9,11 @@
 #include <vector>
 #ifdef STORMM_USE_HPC
 #  ifdef STORMM_USE_CUDA
+// cuda_runtime_api.h is the only CUDA header that defines CUDART_VERSION, which is tested below
+// to select the vector-type nomenclature.  Without it the test reads an undefined macro as 0 and
+// silently takes the pre-CUDA-13 branch in any translation unit that has not already included
+// cuda_runtime.h, so host and device objects disagree on what double4_16a is.
+#    include <cuda_runtime_api.h>
 #    include <vector_types.h>
 #    include <cufft.h>
 #  endif
@@ -261,7 +266,18 @@ typedef double4 double4_16a;
 typedef longlong4 longlong4_16a;
 typedef ulonglong4 ulonglong4_16a;
 #  else 
-#    ifndef __CUDACC__
+#    ifdef STORMM_USE_CUDA
+// CUDA 13's vector_types.h defines these as unguarded plain structs, so HOST translation units
+// see them exactly as device ones do.  Alias the global types into stormm::data_types (as the
+// CUDART_VERSION < 13000 branch above does for double4 etc.) so that the `using
+// data_types::double4_16a` declarations at the bottom of this header resolve.  Defining separate
+// cognates here -- as a guard on __CUDACC__ rather than on STORMM_USE_CUDA would do -- gives host
+// code a second, distinct set of these types, which makes unqualified uses ambiguous and splits
+// the host/device ABI at link time.
+typedef ::double4_16a double4_16a;
+typedef ::longlong4_16a longlong4_16a;
+typedef ::ulonglong4_16a ulonglong4_16a;
+#    else // STORMM_USE_CUDA
 #      if defined(__linux__) || defined(__unix) || defined(__unix__)
 typedef struct double4_16a_base {
   double x;
@@ -326,7 +342,7 @@ typedef __declspec(align(16)) struct ulonglong4_16a_base {
   unsigned long long int w;
 } ulonglong4_16a;
 #      endif // Various operating system cases
-#    endif // CUDA compiler is not in use
+#    endif // STORMM_USE_CUDA
 #  endif // CUDART_VERSION < 13000
 #endif // STORMM_USE_HPC
 
