@@ -46,6 +46,7 @@
 #include "Trajectory/trim.h"
 #include "UnitTesting/stopwatch.h"
 #include "dynamics_intervention.h"
+#include "hpc_kinetic.h"
 
 namespace stormm {
 namespace mm {
@@ -123,6 +124,7 @@ using trajectory::MotionSweeper;
 using trajectory::MotionSweepWriter;
 using trajectory::removeMomentum;
 using trajectory::Thermostat;
+using trajectory::ThermostatKind;
 using trajectory::ThermostatWriter;
 using trajectory::TrajectoryKind;
 using trajectory::writeSynthesisFrames;

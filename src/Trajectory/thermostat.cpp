@@ -1129,6 +1129,30 @@ void Thermostat::refresh(const size_t index_start, const size_t index_end,
 
 #ifdef STORMM_USE_HPC
 //-------------------------------------------------------------------------------------------------
+void Thermostat::refresh(const GpuDetails &gpu) {
+  switch (kind) {
+  case ThermostatKind::NONE:
+  case ThermostatKind::BERENDSEN:
+    return;
+  case ThermostatKind::ANDERSEN:
+  case ThermostatKind::LANGEVIN:
+    break;
+  }
+  switch (cache_config) {
+  case PrecisionModel::DOUBLE:
+    fillRandomCache(&random_state_vector_xy, &random_state_vector_zw, &random_cache,
+                    padded_atom_count, random_cache_depth * 3, RandomAlgorithm::XOSHIRO_256PP,
+                    RandomNumberKind::GAUSSIAN, 0, atom_count, gpu);
+    break;
+  case PrecisionModel::SINGLE:
+    fillRandomCache(&random_state_vector_xy, &random_state_vector_zw, &sp_random_cache,
+                    padded_atom_count, random_cache_depth * 3, RandomAlgorithm::XOSHIRO_256PP,
+                    RandomNumberKind::GAUSSIAN, 0, atom_count, gpu);
+    break;
+  }
+}
+
+//-------------------------------------------------------------------------------------------------
 void Thermostat::upload() {
   partitions.upload();
   initial_temperatures.upload();

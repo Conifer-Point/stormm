@@ -683,6 +683,13 @@ public:
   void refresh(size_t index_start, size_t index_end, int refresh_depth = 0);
 
 #ifdef STORMM_USE_HPC
+  /// \brief Refill all layers of the random number cache on the GPU device, advancing the
+  ///        thermostat's random number generators in the process.  This is for workflows whose
+  ///        kernels do not fuse the refresh, e.g. dynamics with periodic boundary conditions.
+  ///
+  /// \param gpu  Specifications of the GPU in use
+  void refresh(const GpuDetails &gpu);
+
   /// \brief Upload the thermostat's data from the host to the HPC device.  Because the GPU is
   ///        used to initialize the vector of random number states (random_sv), this array is
   ///        uploaded and downloaded for synchronization upon initialization.  However, the initial

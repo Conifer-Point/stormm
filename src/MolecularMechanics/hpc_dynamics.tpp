@@ -241,6 +241,15 @@ void launchDynamics(PhaseSpaceSynthesis *poly_ps, Condensate *staging_zone,
       mos->updateCyclePosition();
     }
 
+    // Unlike the tile-group kernels for isolated systems, the PME kernels do not refill the
+    // thermostat's random number cache.  Refill it here once all of its layers have been used,
+    // or every atom would receive the same Langevin bump on every step.  The thermostat's
+    // constructor filled the cache for the first step.
+    if (d_tstw.kind == ThermostatKind::LANGEVIN && step_idx > 0 &&
+        d_tstw.step % d_tstw.depth == 0) {
+      tst->refresh(gpu);
+    }
+
     // Initialize energy accumulators if needed.  Set pointers to the appropriate molecular
     // mechanics control objects for either precision model.  On energy-yielding steps, a pointer
     // to the energy tracking object's device-facing abstract will be included.  On all other
@@ -554,6 +563,7 @@ void launchDynamics(PhaseSpaceSynthesis *poly_ps, Condensate *staging_zone,
       d_ctrl_fe.step += 1;
       f_ctrl_fe.step += 1;
       mmctrl_fe->incrementStep();
+      launchTemperatureComputation(poly_ag, &scw, d_tstw.cnst_geom, gpu);
       sc->commit(devc, gpu);
       sc->incrementSampleCount();
 
