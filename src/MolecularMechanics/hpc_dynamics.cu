@@ -725,12 +725,12 @@ ScoreCard launchDynamics(const AtomGraphSynthesis &poly_ag, PhaseSpaceSynthesis 
       mmctrl_fe.primeWorkUnitCounters(launcher, EvaluateForce::YES, EvaluateEnergy::YES,
                                       ClashResponse::NONE, VwuGoal::MOVE_PARTICLES, valence_prec,
                                       nonbond_prec, QMapMethod::ACC_SHARED, nonbond_prec,
-                                      double_type_index, pmecon.getInterpolationOrder(),
+                                      float_type_index, pmecon.getInterpolationOrder(),
                                       NeighborListKind::MONO, cg.getTinyBoxPresence(), poly_ag);
       mmctrl_fx.primeWorkUnitCounters(launcher, EvaluateForce::YES, EvaluateEnergy::NO,
                                       ClashResponse::NONE, VwuGoal::MOVE_PARTICLES, valence_prec,
                                       nonbond_prec, QMapMethod::ACC_SHARED, nonbond_prec,
-                                      double_type_index, pmecon.getInterpolationOrder(),
+                                      float_type_index, pmecon.getInterpolationOrder(),
                                       NeighborListKind::MONO, cg.getTinyBoxPresence(), poly_ag);
       const int2 pair_fe_lp = launcher.getPMEPairsKernelDims(nonbond_prec, nonbond_prec,
                                                              NeighborListKind::MONO,
