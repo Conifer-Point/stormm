@@ -40,19 +40,25 @@ std::string getHpcErrorString(const cufftResult event, const HpcErrorVerbosity s
       return std::string("One or more of the parameters is not a supported size");
     case CUFFT_UNALIGNED_DATA:
       return std::string("The data was not aligned for cuFFT");
+#if CUDART_VERSION < 13000
     case CUFFT_INCOMPLETE_PARAMETER_LIST:
       return std::string("Missing parameters in call");
+#endif
     case CUFFT_INVALID_DEVICE:
       return std::string("An invalid GPU index was specified in a descriptor or Execution of a "
                          "plan was on different GPU than plan creation");
+#if CUDART_VERSION < 13000
     case CUFFT_PARSE_ERROR:
       return std::string("Internal plan database error");
+#endif
     case CUFFT_NO_WORKSPACE:
       return std::string("No workspace has been provided prior to plan execution");
     case CUFFT_NOT_IMPLEMENTED:
       return std::string("Function does not implement functionality for parameters given");
+#if CUDART_VERSION < 13000
     case CUFFT_LICENSE_ERROR:
       return std::string("Used in previous versions");
+#endif
     case CUFFT_NOT_SUPPORTED:
       return std::string("Operation is not supported for parameters given");
     }
@@ -79,18 +85,24 @@ std::string getHpcErrorString(const cufftResult event, const HpcErrorVerbosity s
       return std::string("CUFFT_INVALID_SIZE");
     case CUFFT_UNALIGNED_DATA:
       return std::string("CUFFT_UNALIGNED_DATA");
+#if CUDART_VERSION < 13000
     case CUFFT_INCOMPLETE_PARAMETER_LIST:
       return std::string("CUFFT_INCOMPLETE_PARAMETER_LIST");
+#endif
     case CUFFT_INVALID_DEVICE:
       return std::string("CUFFT_INVALID_DEVICE");
+#if CUDART_VERSION < 13000
     case CUFFT_PARSE_ERROR:
       return std::string("CUFFT_PARSE_ERROR");
+#endif
     case CUFFT_NO_WORKSPACE:
       return std::string("CUFFT_NO_WORKSPACE");
     case CUFFT_NOT_IMPLEMENTED:
       return std::string("CUFFT_NOT_IMPLEMENTED");
+#if CUDART_VERSION < 13000
     case CUFFT_LICENSE_ERROR:
       return std::string("CUFFT_LICENSE_ERROR");
+#endif
     case CUFFT_NOT_SUPPORTED:
       return std::string("CUFFT_NOT_SUPPORTED");
     }
