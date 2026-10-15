@@ -1353,8 +1353,9 @@ void stepwisePMELaboratory(const TestSystemManager &tsm, const DynamicsControls 
                                       fintrp_lp);
 
         // CPU process: gather forces due to the mesh-based potential
-        gatherForces<double, llint, double, double2, double4>(host_dcgw_ptr, host_dpmrdr,
-                                                              *host_borders_ptr, host_dpoly_nbk);
+        gatherForces<double, llint, double, double2, double4_16a>(host_dcgw_ptr, host_dpmrdr,
+                                                                  *host_borders_ptr,
+                                                                  host_dpoly_nbk);
         
         // Check progress
         checkCellGridForces<double, llint, double, double4_16a>(dd_cgr_ptr, host_dcgr_ptr, poly_ps,
