@@ -609,7 +609,7 @@ ScoreCard launchDynamics(const AtomGraphSynthesis &poly_ag, PhaseSpaceSynthesis 
   PPITable nrg_tab(NonbondedTheme::ELECTROSTATIC, BasisFunctions::MIXED_FRACTIONS,
                    TableIndexing::SQUARED_ARG, mmctrl_fe.getElectrostaticCutoff(), 0.0,
                    pmecon.getDirectSumTolerance(), log_tab_bits);
-  Thermostat tst(poly_ag, dyncon, sysc, syscmap.getCacheOrigins());
+  Thermostat tst(poly_ag, dyncon, sysc, syscmap.getCacheOrigins(), gpu);
   MotionSweeper mos(poly_ps, preccon.getMomentumConservationBits(), preccon.getCenterOfMassBits());
   const CoreKlManager launcher(gpu, poly_ag);
   switch (poly_ag.getUnitCellType()) {
