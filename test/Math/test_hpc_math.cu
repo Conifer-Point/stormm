@@ -735,16 +735,25 @@ void testSplitFixedPrecision(const int nsmp, Xoroshiro128pGenerator *xrs) {
     for (int j = -2; j <= 2; ++j) {
       for (int k = -2; k <= 2; ++k) {
         for (int m = -2; m <= 2; ++m) {
+          // The "a" values are keyed to i and the "b" values to k, so each index needs its own
+          // sign test.  Selecting the "b" values on i left INT_MAX - (-1 - k) to be evaluated
+          // for k >= 0, i.e. INT_MAX + 1: signed overflow, which is undefined behavior.  gcc
+          // -O3 takes it as proof the loop bound is unreachable and emits a runaway induction
+          // variable that walks off the end of these arrays.
           if (i < 0) {
            arr_a_pointer[ijkm] = INT_MAX - (-1 - i);
-           arr_b_pointer[ijkm] = INT_MAX - (-1 - k);
            llarr_a_pointer[ijkm] = LLONG_MAX - (-1 - i);
-           llarr_b_pointer[ijkm] = LLONG_MAX - (-1 - k);
           }
           else {
            arr_a_pointer[ijkm] = INT_MIN + i;
-           arr_b_pointer[ijkm] = INT_MIN + k;
            llarr_a_pointer[ijkm] = LLONG_MIN + i;
+          }
+          if (k < 0) {
+           arr_b_pointer[ijkm] = INT_MAX - (-1 - k);
+           llarr_b_pointer[ijkm] = LLONG_MAX - (-1 - k);
+          }
+          else {
+           arr_b_pointer[ijkm] = INT_MIN + k;
            llarr_b_pointer[ijkm] = LLONG_MIN + k;
           }
           arr_a_ovrf_pointer[ijkm] = j;
