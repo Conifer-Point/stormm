@@ -452,6 +452,15 @@ target_include_directories(${PROJECT_NAME}_cpu_objects
     $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
 
+# CPU sources are compiled with -DSTORMM_USE_CUDA and include CUDA headers, so they need the
+# toolkit include path as well.
+if(STORMM_ENABLE_CUDA)
+    target_include_directories(${PROJECT_NAME}_cpu_objects
+        PUBLIC
+        ${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES}
+    )
+endif()
+
 if(STORMM_ENABLE_RDKIT)
     target_link_libraries(${PROJECT_NAME}_cpu_objects PUBLIC RDKit::SmilesParse)
 endif()
