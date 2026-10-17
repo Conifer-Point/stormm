@@ -254,6 +254,15 @@ void dynamics(PhaseSpaceSynthesis *poly_ps, CellGrid<Tcoord, Tacc, Tcalc, Tcoord
   const double dsum_tol = pmecon.getDirectSumTolerance();
   const double ew_coeff = ewaldCoefficient(cutoff, dsum_tol);
   const VdwSumMethod vdw_sum = dyncon.getVdwSummation();
+
+  // The reciprocal-space convolution must use the same Ewald coefficient as the direct sum.
+  if (fabs(ew_coeff - cvol->getEwaldCoefficient()) > constants::tiny) {
+    rtErr("The Ewald coefficient implied by the neighbor list cutoff and the direct sum "
+          "tolerance (" + parse::realToString(ew_coeff, 9, 6, parse::NumberFormat::STANDARD_REAL) +
+          ") differs from the coefficient of the reciprocal-space convolution (" +
+          parse::realToString(cvol->getEwaldCoefficient(), 9, 6,
+                              parse::NumberFormat::STANDARD_REAL) + ").", "dynamics");
+  }
   
   // Produce critical abstracts for other objects as needed
   for (int step = 0; step < dyncon.getStepCount(); step++) {

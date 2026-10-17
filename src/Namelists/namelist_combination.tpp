@@ -8,7 +8,6 @@ namespace namelist {
 //-------------------------------------------------------------------------------------------------
 template <typename T>
 double arbitrateCutoff(const T &foocon, const PPPMControls &pmecon, const NonbondedTheme theme) {
-  double result;
   const NamelistEmulator& foo_nml = foocon.getTranscript();
   const NamelistEmulator& pme_nml = pmecon.getTranscript();
   bool problem = false;
@@ -95,6 +94,13 @@ double arbitrateCutoff(const T &foocon, const std::vector<PPPMControls> &pmeconv
           "and accumulated.", "arbitrateCutoff");
   }
   __builtin_unreachable();
+}
+
+//-------------------------------------------------------------------------------------------------
+template <typename T>
+double arbitrateEwaldCoefficient(const T &foocon, const PPPMControls &pmecon) {
+  return energy::ewaldCoefficient(arbitrateCutoff(foocon, pmecon, NonbondedTheme::ELECTROSTATIC),
+                                  pmecon.getDirectSumTolerance());
 }
 
 } // namespace namelist

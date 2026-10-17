@@ -643,6 +643,9 @@ int main(int argc, const char* argv[]) {
         break;
       case UnitCellType::ORTHORHOMBIC:
       case UnitCellType::TRICLINIC:
+
+        // dynamics() derives the direct-space Ewald coefficient from the neighbor list cutoff and
+        // the direct sum tolerance.  The reciprocal-space convolution must use the same value.
         switch (preccon.getNonbondedMethod()) {
         case PrecisionModel::DOUBLE:
           {
@@ -655,7 +658,8 @@ int main(int argc, const char* argv[]) {
             PMIGrid pmig(&cg, NonbondedTheme::ELECTROSTATIC, pmecon.getInterpolationOrder(),
                          PrecisionModel::DOUBLE, FFTMode::OUT_OF_PLACE,
                          preccon.getChargeMeshScalingBits(), preccon.getChargeMeshScalingBits());
-            ConvolutionManager cvol(&pmig, pmecon.getEwaldCoefficient());
+            ConvolutionManager cvol(&pmig, ewaldCoefficient(cg.getCutoff(),
+                                                            pmecon.getDirectSumTolerance()));
             dynamics<double, llint, double, double4_16a>(&poly_ps, &cg, &pmig, &cvol, &edyn, &tst,
                                                          poly_ag, lem, dyncon, preccon, pmecon);
           }
@@ -671,7 +675,8 @@ int main(int argc, const char* argv[]) {
             PMIGrid pmig(&cg, NonbondedTheme::ELECTROSTATIC, pmecon.getInterpolationOrder(),
                          PrecisionModel::SINGLE, FFTMode::OUT_OF_PLACE,
                          preccon.getChargeMeshScalingBits(), preccon.getChargeMeshScalingBits());
-            ConvolutionManager cvol(&pmig, pmecon.getEwaldCoefficient());
+            ConvolutionManager cvol(&pmig, ewaldCoefficient(cg.getCutoff(),
+                                                            pmecon.getDirectSumTolerance()));
             dynamics<float, int, float, float4>(&poly_ps, &cg, &pmig, &cvol, &edyn, &tst, poly_ag,
                                                 lem, dyncon, preccon, pmecon);
           }
