@@ -8,6 +8,7 @@ set(STORMM_TEST_SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/Parsing/test_input.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Parsing/test_output.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Namelists/test_namelists.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Namelists/test_namelist_combination.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Math/test_clustering.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Math/test_math.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/Math/test_numerics.cpp

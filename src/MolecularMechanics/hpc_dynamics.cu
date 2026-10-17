@@ -5,6 +5,7 @@
 #include "Math/math_enumerators.h"
 #include "Math/rounding.h"
 #include "Math/series_ops.h"
+#include "Namelists/namelist_combination.h"
 #include "Parsing/parsing_enumerators.h"
 #include "Potential/hpc_nonbonded_potential.h"
 #include "Topology/atomgraph_enumerators.h"
@@ -22,6 +23,7 @@ using energy::NonbondedTheme;
 using energy::launchNonbonded;
 using energy::StateVariable;
 using energy::ValenceKernelSize;
+using namelist::arbitrateEwaldCoefficient;
 using parse::NumberFormat;
 using stmath::BasisFunctions;
 using stmath::FFTMode;
@@ -596,6 +598,11 @@ ScoreCard launchDynamics(const AtomGraphSynthesis &poly_ag, PhaseSpaceSynthesis 
   // user input as to the cutoff, it is now the "source of truth." Both variables will contain the
   // same results for the single, unified cutoff that the simulation will rely upon, so take
   // mmctrl_fe as representative.
+  //
+  // The particle-particle interaction table derives its Ewald coefficient from the arbitrated
+  // cutoff and the direct sum tolerance.  The reciprocal-space convolution must use the same
+  // coefficient, which is not the one stored in pmecon if the cutoff came from &dynamics.
+  const double ew_coeff = arbitrateEwaldCoefficient(dyncon, pmecon);
   LocalExclusionMask lem(poly_ag);
   int log_tab_bits;
   switch (preccon.getNonbondedMethod()) {
@@ -692,7 +699,7 @@ ScoreCard launchDynamics(const AtomGraphSynthesis &poly_ag, PhaseSpaceSynthesis 
       PMIGrid pmig(&cg, NonbondedTheme::ELECTROSTATIC, pmecon.getInterpolationOrder(),
                    nonbond_prec, FFTMode::OUT_OF_PLACE, preccon.getChargeMeshScalingBits(),
                    preccon.getChargeMeshScalingBits(), gpu, pmecon.getDensityMappingMethod());
-      ConvolutionManager cvol(pmig, pmecon.getEwaldCoefficient(), gpu);
+      ConvolutionManager cvol(pmig, ew_coeff, gpu);
       cg.upload();
       pmig.upload();
       cvol.upload();
@@ -749,7 +756,7 @@ ScoreCard launchDynamics(const AtomGraphSynthesis &poly_ag, PhaseSpaceSynthesis 
       PMIGrid pmig(&cg, NonbondedTheme::ELECTROSTATIC, pmecon.getInterpolationOrder(),
                    nonbond_prec, FFTMode::OUT_OF_PLACE, preccon.getChargeMeshScalingBits(),
                    preccon.getChargeMeshScalingBits(), gpu, pmecon.getDensityMappingMethod());
-      ConvolutionManager cvol(pmig, pmecon.getEwaldCoefficient(), gpu);
+      ConvolutionManager cvol(pmig, ew_coeff, gpu);
       cg.upload();
       pmig.upload();
       cvol.upload();

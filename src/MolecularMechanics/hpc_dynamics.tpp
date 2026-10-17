@@ -18,6 +18,17 @@ void launchDynamics(PhaseSpaceSynthesis *poly_ps, Condensate *staging_zone,
                     const SynthesisCacheMap &syscmap, const GpuDetails &gpu,
                     const CoreKlManager &launcher, const PrecisionModel valence_prec,
                     StopWatch *timer, ProgressBar *progress_bar, const std::string &task_name) {
+
+  // The direct- and reciprocal-space parts of the Ewald sum add up to the Coulomb potential only
+  // if both use the same Ewald coefficient.
+  if (fabs(nrg_tab.getEwaldCoefficient() - cvol->getEwaldCoefficient()) > constants::tiny) {
+    rtErr("The particle-particle interaction table and the reciprocal-space convolution use "
+          "different Ewald coefficients (" +
+          parse::realToString(nrg_tab.getEwaldCoefficient(), 9, 6,
+                              parse::NumberFormat::STANDARD_REAL) + " and " +
+          parse::realToString(cvol->getEwaldCoefficient(), 9, 6,
+                              parse::NumberFormat::STANDARD_REAL) + ").", "launchDynamics");
+  }
   const int ntpr   = dyncon.getDiagnosticPrintFrequency();
   const int ntwx   = dyncon.getTrajectoryPrintFrequency();
   const int nframe = (roundUp(dyncon.getStepCount(), ntpr) / ntpr) + 1;
